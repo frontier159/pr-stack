@@ -52,11 +52,13 @@ cross-boundary edits — and when that minimum defeats the split, propose a
    row goes to its package's lowest tier, and with no package it is
    flagged in the plan for the operator.
    ✓ done when every changed file has a tier and a side (backend/ui).
-3. **Plan → sign-off** — before any git surgery, present the full
-   decomposition: numbered PRs × numbered commits, each with a one-line
-   rationale and its tier. The operator may mark **joins** (merge PRs or
-   commits, like squashing picks in an interactive rebase) or re-cut.
-   ✓ done when the operator approves the (join-marked) plan.
+3. **Plan → sign-off** — before any git surgery, write the full
+   decomposition into your reply text — the operator reads only that,
+   never tool results or subagent output: numbered PRs × numbered
+   commits, each with a one-line rationale and its tier. The operator
+   may mark **joins** (merge PRs or commits, like squashing picks in an
+   interactive rebase) or re-cut.
+   ✓ done when the operator approves a plan they have read in full.
 4. **Carve** — stack order: ascending map tier. Start each PR as a
    branch `<feature>-stack-<n>-<slug>`, created from the previous PR's
    tip (PR 1 from `BASE`). Within a PR: technical-only commits first,
