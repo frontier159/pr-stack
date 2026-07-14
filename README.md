@@ -104,6 +104,19 @@ bottom-up, chains PR bases, documents stack order.
   validated, so reviewers judge legibility instead of re-verifying
   behaviour.
 
+## Examples
+
+Real artifacts with fictional names, shaped by a 270-file production run:
+
+- [001-monorepo-split.md](examples/001-monorepo-split.md) — a full run,
+  invocation to handoff: the plan as the operator reads it, a join
+  exchange, split-file carving, baseline-aware verification.
+- [pr-stack-map.example.md](examples/pr-stack-map.example.md) — the
+  generated map for a multi-ecosystem monorepo, annotated.
+
+This repo also dogfoods the skill: these example files landed as a
+stacked PR set carved by pr-stack from one messy branch.
+
 ## Hard rules
 
 - Never touches the original branch or worktree; all surgery happens in
