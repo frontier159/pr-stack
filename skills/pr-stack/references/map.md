@@ -3,13 +3,16 @@
 Run on an explicit "pr-stack map" request, or from Split step 2 when the
 file is stale or missing. Output: `pr-stack-map.md` at the repo root.
 
-1. **Derive tiers** — parse the ecosystem's workspace manifests (e.g.
-   `pnpm-workspace.yaml` / `package.json` workspaces, `Cargo.toml
-   [workspace]`, `go.work`, `settings.gradle`), plus each package's
-   dependencies. Topologically sort: depended-on packages get lower
-   tiers, the app package(s) last. No workspace manifests → the repo is
-   a single package at tier 1; continue to step 2 for its layers.
-   ✓ done when every package has a tier.
+1. **Derive tiers** — scan the whole repo for ecosystem manifests (e.g.
+   `pnpm-workspace.yaml` / `package.json` workspaces, `Cargo.toml`,
+   `go.work`, `foundry.toml`, `settings.gradle`); one repo may host
+   several ecosystems side by side, and every one contributes packages.
+   Parse each package's dependencies and topologically sort:
+   depended-on packages get lower tiers, the app package(s) last;
+   ecosystems with no dependency edges between them sort independently.
+   No manifests at all → the repo is a single package at tier 1;
+   continue to step 2 for its layers.
+   ✓ done when every package in every ecosystem has a tier.
 2. **Classify sides** — a package with no UI-framework dependency
    (react/vue/svelte/…) is a single `backend` tier, no questions asked.
    A UI-app package gets proposed intra-package layers using, in priority
