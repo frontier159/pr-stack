@@ -41,7 +41,10 @@ the changed-file set.
    row matches go in an explicit `unmapped` row.
    ✓ done when the file round-trips: a fresh Split step 2 hash check
    passes, every row's verify command exists in the named package, and
-   every `git ls-files` path buckets into a row (`unmapped` included).
+   every `git ls-files` path matches some row's `paths` globs
+   (`unmapped` included) — a glob match, not mere package membership;
+   inside a layer-split package an unmatched file falls to the wrong
+   tier *and side*.
 
 File shape (rows and hash command are examples — derive them from the
 repo at hand):
