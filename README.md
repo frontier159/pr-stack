@@ -4,10 +4,13 @@ An agent skill that splits one chunky "it all works" branch into a stacked
 set of review-friendly PRs. The big model does the carving; humans and
 review bots get PRs they can read.
 
-```
-you ──── END + BASE ───▶  /pr-stack  ──── plan (you approve) ───▶ stacked PRs
-                              │                                      │
-                              └── pr-stack-map.md (repo layout)      └── tip ≡ END, every PR green
+```mermaid
+flowchart LR
+    you([you]) -- "END + BASE" --> ps[["/pr-stack"]]
+    map[("pr-stack-map.md<br>repo layout")] -.-> ps
+    ps -- "proposed plan" --> ok{you approve}
+    ok -- "join / re-cut" --> ps
+    ok -- carve --> prs["stacked PRs<br>tip ≡ END · every PR tip green"]
 ```
 
 ## Install
