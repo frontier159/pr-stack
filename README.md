@@ -31,13 +31,13 @@ pr-stack map                generate/regenerate pr-stack-map.md
 create a PR                 (chunky diff? the agent offers the split first)
 ```
 
-One-shot: it runs when you ask, for that request alone.
+It runs when you ask, for that request alone.
 
 ## How to use
 
 1. Finish your feature branch and get it green. That branch is `END`; the
    branch you target is `BASE`.
-2. Say `split <branch> onto <base>`. The agent opens a fresh worktree,
+2. From within your branch, say `/pr-stack onto <base>`. The agent opens a fresh worktree,
    never touching your branch, and buckets every changed file using
    `pr-stack-map.md`. No map yet? It generates one, confirming UI-package
    layers with you once.
