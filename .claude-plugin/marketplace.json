@@ -1,0 +1,15 @@
+{
+  "name": "pr-stack",
+  "owner": {
+    "name": "frontier159"
+  },
+  "metadata": {
+    "description": "Claude marketplace catalog for the pr-stack plugin."
+  },
+  "plugins": [
+    {
+      "name": "pr-stack",
+      "source": "./"
+    }
+  ]
+}

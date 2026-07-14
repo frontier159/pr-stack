@@ -1,0 +1,13 @@
+{
+  "name": "pr-stack",
+  "description": "Split one chunky branch into a stacked set of review-friendly PRs. Re-carves the cumulative diff into fresh, ordered commits — plan approved by you first, every PR tip green, final tip provably identical to your branch.",
+  "version": "1.0.0",
+  "author": {
+    "name": "frontier159",
+    "url": "https://github.com/frontier159"
+  },
+  "homepage": "https://github.com/frontier159/pr-stack",
+  "repository": "https://github.com/frontier159/pr-stack",
+  "license": "MIT",
+  "keywords": ["pull-requests", "stacked-prs", "code-review", "git", "agents"]
+}
