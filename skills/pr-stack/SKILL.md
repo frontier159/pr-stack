@@ -17,10 +17,12 @@ state, assumed green. `BASE` — the ancestor branch the stack targets.
 `BASE..END` diff into fresh commits — the original commits are raw
 material, not units to reorder.
 
-**One hard rule**: every PR tip is **green**. Green for a commit = the
-map's verify commands for every tier the commit touches; for a PR tip,
-those plus every higher tier depending on them; whole-repo green runs
-once, on the final tip.
+**One hard rule**: every PR tip is **green**. Green is judged against
+`END`: record each touched tier's verify failures at `END` before
+carving — green means no new failures, not zero. Per commit, the
+touched tiers' cheap checks (typecheck + lint) suffice; each PR tip
+runs the full verify battery for its touched tiers plus every higher
+tier depending on them; whole-repo green runs once, on the final tip.
 Every cut rule below yields to it: when a slice cannot go green without
 edits across a boundary (another package, the UI), pull in the minimal
 cross-boundary edits — and when that minimum defeats the split, propose a
@@ -59,22 +61,28 @@ cross-boundary edits — and when that minimum defeats the split, propose a
    may mark **joins** (merge PRs or commits, like squashing picks in an
    interactive rebase) or re-cut.
    ✓ done when the operator approves a plan they have read in full.
-4. **Carve** — stack order: ascending map tier. Start each PR as a
-   branch `<feature>-stack-<n>-<slug>`, created from the previous PR's
-   tip (PR 1 from `BASE`). Within a PR: technical-only commits first,
-   then feature commits dependencies-first (api/logic with its tests →
-   components → pages). Build each commit by applying `END`'s content
-   for its slice: `git restore --source=END --staged --worktree --
-   <paths>` for whole files — it stages adds, edits, and deletes alike;
-   for a file split across commits, write the intermediate content
-   directly and commit, and let the final commit touching it restore
-   `END`'s content the same way. Verify per the Cut rules, commit.
+4. **Carve** — stack order: ascending map tier. Pick a stack codename;
+   start each PR as a branch `<codename>-stack-<n>-<slug>`, created
+   from the previous PR's tip (PR 1 from `BASE`). Within a PR:
+   technical-only commits first, then feature commits
+   dependencies-first (api/logic with its tests → components → pages).
+   Build each commit by applying `END`'s content for its slice:
+   `git restore --source=END --staged --worktree -- <paths>` for whole
+   files — it stages adds, edits, and deletes alike. For a file split
+   across commits, write the intermediate content directly — prefer
+   `END` minus the later themes' work, stripped by a symbol denylist
+   built first so `grep` proves the strip — and let the final commit
+   touching it restore `END`'s content the same way. Commit, then
+   verify the committed `HEAD` per the Cut rules; amend on failure.
    ✓ done when every planned commit exists and every PR tip is green.
-5. **Verify** — `git diff <final-tip> END` prints nothing; re-run the
-   green check on each PR tip.
+5. **Verify** — `git diff <final-tip> END` prints nothing. A tip whose
+   tree is unchanged since its carve-time green check is already
+   verified — re-run green only where the tree differs.
    ✓ both pass, or return to Carve.
-6. **Hand off** — push branches bottom-up; set each PR's base to its
-   predecessor's branch; each PR description states its stack position
+6. **Hand off** — push branches bottom-up; create every PR before
+   writing cross-links (PR numbers exist only after creation); set each
+   PR's base to its predecessor's branch; each PR description states
+   its stack position
    and links its neighbours, and the stack summary notes: after each
    merge, retarget the next PR's base and rebase the remaining stack —
    post-merge maintenance is the operator's.

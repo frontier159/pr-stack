@@ -2,6 +2,8 @@
 
 Run on an explicit "pr-stack map" request, or from Split step 2 when the
 file is stale or missing. Output: `pr-stack-map.md` at the repo root.
+The map describes the repo, not any diff — never scope generation to
+the changed-file set.
 
 1. **Derive tiers** — scan the whole repo for ecosystem manifests (e.g.
    `pnpm-workspace.yaml` / `package.json` workspaces, `Cargo.toml`,
@@ -29,10 +31,17 @@ file is stale or missing. Output: `pr-stack-map.md` at the repo root.
    everything below the marker survives regeneration verbatim. The header
    embeds the exact command hashing the manifests read AND its output —
    the command is the single source of truth for staleness; Split reruns
-   it verbatim and compares. Each row carries the verify commands from
-   that package's own toolchain (build/typecheck/lint/test).
+   it verbatim and compares; derive its path list from discovery so it
+   covers every manifest consulted, in every ecosystem, at whatever
+   depth. Each row carries the verify commands from that package's own
+   toolchain (build/typecheck/lint/test); detect snapshot-installed
+   workspace deps (e.g. lockfile `file:` or injected entries —
+   dependents build against a stale copy until re-install) and prepend
+   the refresh command to every consumer tier's verify recipe. Paths no
+   row matches go in an explicit `unmapped` row.
    ✓ done when the file round-trips: a fresh Split step 2 hash check
-   passes and every row's verify command exists in the named package.
+   passes, every row's verify command exists in the named package, and
+   every `git ls-files` path buckets into a row (`unmapped` included).
 
 File shape (rows and hash command are examples — derive them from the
 repo at hand):
