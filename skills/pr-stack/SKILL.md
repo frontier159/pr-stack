@@ -30,6 +30,11 @@ cross-boundary edits — and when that minimum defeats the split, propose a
 
 ## Cut rules
 
+- **Coalesce pass**: after drafting the stack, scan adjacent PRs from the
+  bottom and join each pair whose combined diff remains coherent and
+  reviewable. Repeat the scan until you can justify each boundary with
+  another cut rule or a delivery/rollback need; name each reason in the
+  plan.
 - One feature (or small coherent set) per PR; ≤10 commits per PR.
 - Backend and UI in separate PRs, except forced-joins.
 - Own commit for: an upstream-package change (+ its minimal dependents), a
@@ -57,10 +62,12 @@ cross-boundary edits — and when that minimum defeats the split, propose a
 3. **Plan → sign-off** — before any git surgery, write the full
    decomposition into your reply text — the operator reads only that,
    never tool results or subagent output: numbered PRs × numbered
-   commits, each with a one-line rationale and its tier. The operator
+   commits, each with a one-line rationale and its tier. Run the coalesce
+   pass and name the reason for every remaining PR boundary. The operator
    may mark **joins** (merge PRs or commits, like squashing picks in an
    interactive rebase) or re-cut.
-   ✓ done when the operator approves a plan they have read in full.
+   ✓ done when the operator can see each boundary reason and approves the
+   plan.
 4. **Carve** — stack order: ascending map tier. Pick a stack codename;
    start each PR as a branch `<codename>-stack-<n>-<slug>`, created
    from the previous PR's tip (PR 1 from `BASE`). Within a PR:
@@ -81,9 +88,11 @@ cross-boundary edits — and when that minimum defeats the split, propose a
    ✓ both pass, or return to Carve.
 6. **Hand off** — push branches bottom-up; create every PR before
    writing cross-links (PR numbers exist only after creation); set each
-   PR's base to its predecessor's branch; each PR description states
-   its stack position
-   and links its neighbours, and the stack summary notes: after each
-   merge, retarget the next PR's base and rebase the remaining stack —
-   post-merge maintenance is the operator's.
-   ✓ done when every PR is open with the correct base and stack note.
+   PR's base to its predecessor's branch; update every PR description
+   with its stack position, a one-line full linked index in stack order
+   (`**Stack index**: [1 <label>](<url>) → [2 <label>](<url>) → …`), and
+   the maintenance note: after each merge, retarget the next PR's base
+   and rebase the remaining stack; the operator handles post-merge
+   maintenance.
+   ✓ done when every PR is open with the correct base, full index, and
+   maintenance note.
