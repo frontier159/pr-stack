@@ -23,6 +23,8 @@ carving — green means no new failures, not zero. Per commit, the
 touched tiers' cheap checks (typecheck + lint) suffice; each PR tip
 runs the full verify battery for its touched tiers plus every higher
 tier depending on them; whole-repo green runs once, on the final tip.
+When a map's `verify` cell is `none`, that tier declares no runnable
+checks; skip the cell during baselining and verification.
 Every cut rule below yields to it: when a slice cannot go green without
 edits across a boundary (another package, the UI), pull in the minimal
 cross-boundary edits — and when that minimum defeats the split, propose a

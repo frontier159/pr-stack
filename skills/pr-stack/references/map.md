@@ -35,18 +35,22 @@ the changed-file set.
    the command is the single source of truth for staleness; Split reruns
    it verbatim and compares; derive its path list from discovery so it
    covers every manifest consulted, in every ecosystem, at whatever
-   depth. For each row, write a complete shell command from that package's
-   own toolchain that you can invoke as written from the repo root. Inline
-   each required refresh command and qualify each chained package script
+   depth. With no manifests, use `git ls-files | shasum -a 256` as the
+   neutral discovery guard; a new tracked path changes the hash and
+   triggers another scan. Write `none` for a package with no declared
+   runnable checks. For every other row, write a complete shell command
+   from that package's own toolchain that you can invoke as written from
+   the repo root. Inline each required refresh command and qualify each
+   chained package script
    (`pnpm -C <dir> check && pnpm -C <dir> lint`). Detect snapshot-installed
    workspace deps (e.g. lockfile `file:` or injected entries — dependents
    build against a stale copy until re-install) and prepend the refresh
    command to every consumer tier's verify recipe. Paths no row matches
    go in an explicit `unmapped` row.
    ✓ done when the file round-trips: a fresh Split step 2 hash check
-   passes, you can invoke every verify cell as written from the repo root,
-   every invoked package script exists, and every `git ls-files` path
-   matches some row's `paths` globs
+   passes, each verify cell is `none` or you can invoke it as written from
+   the repo root, every invoked package script exists, and every
+   `git ls-files` path matches some row's `paths` globs
    (`unmapped` included) — a glob match, not mere package membership;
    inside a layer-split package an unmatched file falls to the wrong
    tier *and side*.
@@ -60,6 +64,7 @@ repo at hand):
 <!-- inputs-hash: <that command's output> · generated: <date> -->
 | tier | layer          | side    | paths                          | verify |
 |------|----------------|---------|--------------------------------|--------|
+| 0    | repo/docs      | backend | *.md, docs/**                  | none |
 | 1    | utils          | backend | packages/utils/**              | pnpm -C packages/utils build && pnpm -C packages/utils test |
 | 2    | api            | backend | packages/api/**                | pnpm -C packages/api build && pnpm -C packages/api test |
 | 3    | app:api        | backend | packages/app/src/api/**        | pnpm -C packages/app check && pnpm -C packages/app test |
