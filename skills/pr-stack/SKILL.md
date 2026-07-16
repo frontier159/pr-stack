@@ -47,11 +47,13 @@ cross-boundary edits — and when that minimum defeats the split, propose a
 ## Split
 
 1. **Isolate** — `git worktree add` a fresh worktree at `BASE`; the
-   original branch/worktree stays untouched as the known-good state. If
-   `END` is a worktree with uncommitted changes, commit them there first
-   (or `git stash create` and record that SHA) — the recorded SHA must
-   contain the entire final state.
-   ✓ done when the worktree exists and `END`'s SHA is recorded.
+   original branch/worktree stays untouched as the known-good state. For
+   a dirty `END` worktree, show the operator every tracked and untracked
+   change and record the approved inclusion set. Build a snapshot commit
+   with `END`'s `HEAD` as its parent through a temporary index and
+   `git commit-tree`; leave `END`'s ref, worktree, and real index unchanged.
+   ✓ done when the worktree exists, `END`'s SHA is recorded, and a dirty
+   snapshot's diff from its parent equals the approved change set.
 2. **Map** — read `pr-stack-map.md` at the repo root and recompute the
    hash command recorded in its header. Output differs or file missing →
    run [references/map.md](references/map.md) first. Bucket every changed

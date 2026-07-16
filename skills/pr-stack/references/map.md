@@ -25,23 +25,28 @@ the changed-file set.
    ✓ done when every source path in the package matches exactly one layer.
 3. **Confirm once** — on a UI-app package's first generation, show the
    proposed layer table and let the operator tune it before writing. The
-   committed file is the durable answer; later regenerations keep asking
-   only about packages never confirmed before.
+   committed file is the durable answer. Write each confirmation record
+   below the overrides marker. On later runs, carry those records forward
+   and ask only about packages absent from them.
+   ✓ done when every UI-app package has a preserved confirmation record.
 4. **Write the file** — generated block first, then the overrides marker;
    everything below the marker survives regeneration verbatim. The header
    embeds the exact command hashing the manifests read AND its output —
    the command is the single source of truth for staleness; Split reruns
    it verbatim and compares; derive its path list from discovery so it
    covers every manifest consulted, in every ecosystem, at whatever
-   depth. Each row carries the verify commands from that package's own
-   toolchain (build/typecheck/lint/test); detect snapshot-installed
-   workspace deps (e.g. lockfile `file:` or injected entries —
-   dependents build against a stale copy until re-install) and prepend
-   the refresh command to every consumer tier's verify recipe. Paths no
-   row matches go in an explicit `unmapped` row.
+   depth. For each row, write a complete shell command from that package's
+   own toolchain that you can invoke as written from the repo root. Inline
+   each required refresh command and qualify each chained package script
+   (`pnpm -C <dir> check && pnpm -C <dir> lint`). Detect snapshot-installed
+   workspace deps (e.g. lockfile `file:` or injected entries — dependents
+   build against a stale copy until re-install) and prepend the refresh
+   command to every consumer tier's verify recipe. Paths no row matches
+   go in an explicit `unmapped` row.
    ✓ done when the file round-trips: a fresh Split step 2 hash check
-   passes, every row's verify command exists in the named package, and
-   every `git ls-files` path matches some row's `paths` globs
+   passes, you can invoke every verify cell as written from the repo root,
+   every invoked package script exists, and every `git ls-files` path
+   matches some row's `paths` globs
    (`unmapped` included) — a glob match, not mere package membership;
    inside a layer-split package an unmatched file falls to the wrong
    tier *and side*.
@@ -55,11 +60,11 @@ repo at hand):
 <!-- inputs-hash: <that command's output> · generated: <date> -->
 | tier | layer          | side    | paths                          | verify |
 |------|----------------|---------|--------------------------------|--------|
-| 1    | utils          | backend | packages/utils/**              | pnpm -F utils build && … |
-| 2    | api            | backend | packages/api/**                | …      |
-| 3    | app:api        | backend | packages/app/src/api/**        | …      |
-| 4    | app:components | ui      | packages/app/src/components/** | …      |
-| 5    | app:pages      | ui      | packages/app/src/pages/**      | …      |
+| 1    | utils          | backend | packages/utils/**              | pnpm -C packages/utils build && pnpm -C packages/utils test |
+| 2    | api            | backend | packages/api/**                | pnpm -C packages/api build && pnpm -C packages/api test |
+| 3    | app:api        | backend | packages/app/src/api/**        | pnpm -C packages/app check && pnpm -C packages/app test |
+| 4    | app:components | ui      | packages/app/src/components/** | pnpm -C packages/app check && pnpm -C packages/app test |
+| 5    | app:pages      | ui      | packages/app/src/pages/**      | pnpm -C packages/app check && pnpm -C packages/app test |
 
 <!-- MANUAL OVERRIDES — survives regeneration -->
 ```
